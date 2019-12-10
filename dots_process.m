@@ -63,16 +63,18 @@ for i=1:N
         
         % Ark
         % in every rectangle, get the median of all pixels above treshold
-        level_g = graythresh(dot_i_box);
+        % level_comparison = graythresh(dot_i_box);
         [cont,center]=hist(double(dot_i_box(:)),10);
         level = center(2);
 
-        BW = imbinarize(dot_i_box,level/255);
-        imshowpair(dot_i_box,BW,'montage')
+        % display sub-image before and after applying treshold
+%         BW = imbinarize(dot_i_box,level/255);
+%         imshowpair(dot_i_box,BW,'montage')
         
-        mask = dot_i_box > th_i;
+        % mask = dot_i_box > th_i;
+        mask = dot_i_box > level;
         theMedian = median(dot_i_box(mask));
-        disp(theMedian);
+        % disp(theMedian);
 
         theSize= 0;
         for m = 1 : size(mask,1)
@@ -82,9 +84,7 @@ for i=1:N
                 end 
             end
         end 
-        disp(theSize);   
-        
-        
+        % disp(theSize);   
         
         
         [cont,center]=hist(double(dot_i_box(:)),10);
@@ -92,11 +92,15 @@ for i=1:N
         dot_i_bw = dot_i_box>th_i;   
         dot_i_profile(box_i_y:box_i_y+box_i_height) = col_i_line(box_i_y:box_i_y+box_i_height);
         effective_peak_index = find(dot_i_profile>=th_i_new);
-        dot.intensity = median(dot_i_profile(effective_peak_index));        
-        dot.size = length(effective_peak_index);
+%         dot.intensity = median(dot_i_profile(effective_peak_index));        
+%         dot.size = length(effective_peak_index);
+
+        % refined dot intensity and dot size
+        dot.intensity = theMedian;
+        dot.size = theSize;
+        
         Dots = [Dots,dot];
 %         figure(2);hold on;plot(effective_peak_index, dot_i_profile(effective_peak_index),'r');hold off;
-
 
         % what it's for?
         for m=1:size(dot_i_bw,1)
