@@ -40,7 +40,7 @@ for v = 1 : length(current_subfolders)
             im=I(:,:,1);
             im=im(25:end,25:end);
             Dot_valid = dots_process(im,1);
-            pause(1);
+%             pause(1);
 
             % Ark
             % write output to result file
