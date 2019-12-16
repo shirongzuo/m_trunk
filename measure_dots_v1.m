@@ -2,7 +2,7 @@ close all;clear all
 path = 'Z:\m_trunk\test images\';
 
 multipleRecord = {};
-record_index = 1;
+recordIndex = 1;
 
 files_current_folder = dir;
 dirFlags = [files_current_folder.isdir] & ~strcmp({files_current_folder.name},'.') & ~strcmp({files_current_folder.name},'..');
@@ -32,8 +32,11 @@ for v = 1 : length(current_subfolders)
 
         % inside each subfolder...
         imgNames = dir([secondPath,'*.JPG']);  
-    %     multipleRecord = {};
-
+        sumNumber = 0;
+        sumIntensity = 0;
+        sumSize = 0;
+        itemNumber = length(imgNames);
+        imgIntensityVector = [];
         for i=1:length(imgNames)
             name = imgNames(i).name;
             I=imread([secondPath,name]);
@@ -52,63 +55,44 @@ for v = 1 : length(current_subfolders)
             end
 
             % write each record to file
-            entry = int2str(record_index);
+            entry = int2str(recordIndex);
             imgName = name;
 
-            imgID = 'imgID';
-            imgNumber = int2str(length(Dot_valid));
-            imgIntensity = int2str(median(Dot_intensity));
-            imgAboveThres = int2str(10);
-            imgSize = int2str(median(Dot_size));
+%             imgNumber = int2str(length(Dot_valid));
+%             imgIntensity = int2str(median(Dot_intensity));
+%             imgSize = int2str(median(Dot_size));
+%             imgAboveThres = int2str(s);
+            imgNumber = length(Dot_valid);
+            imgIntensity = median(Dot_intensity);
+            imgSize = median(Dot_size);
 
-            singleRecordStr = [entry ',' folderName ',' imgName ',' imgNumber ',' imgIntensity ',' imgSize];
-            multipleRecord = [multipleRecord, singleRecordStr];
-            record_index = record_index+1;
+            sumNumber = sumNumber+imgNumber;
+            sumIntensity = sumIntensity+imgIntensity;
+            sumSize = sumSize+imgSize;
+            imgIntensityVector = [imgIntensityVector,imgIntensity];
+            
+%             singleRecordStr = [entry ',' folderName ',' imgName ',' imgNumber ',' imgIntensity ',' imgSize];
+%             multipleRecord = [multipleRecord, singleRecordStr];
+%             record_index = record_index+1;
         end 
+        folderDotNum = int2str(sumNumber/itemNumber);
+        folderDotIntensity = int2str(sumIntensity/itemNumber);
+        folderDotSize = int2str(sumSize/itemNumber);
+        dotIntensityStd = int2str(std(double(imgIntensityVector)));
+        
+        singleRecordStr = [entry ',' folderName ',' imgName ',' folderDotNum ',' folderDotIntensity ',' dotIntensityStd ',' folderDotSize];        
+        multipleRecord = [multipleRecord, singleRecordStr];
+        recordIndex = recordIndex+1;
         cd ..
     end
     cd ..
 end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% imgNames = dir([path,'*.JPG']);
-
-% multipleRecord = {};
-% 
-% for i=1:length(imgNames)
-%     name = imgNames(i).name;
-%     I=imread([path,name]);
-%     im=I(:,:,1);
-%     im=im(25:end,25:end);
-%     Dot_valid = dots_process(im,1);
-%     pause(1);
-%     
-%     % Ark
-%     % write output to result file
-%     Dot_size=[];
-%     Dot_intensity=[];
-%     for j=1:length(Dot_valid)
-%         Dot_size = [Dot_size,Dot_valid(j).size];
-%         Dot_intensity=[Dot_intensity,Dot_valid(j).intensity];
-%     end
-%     
-%     % write each record to file
-%     entry = int2str(i);
-%     imgName = name;
-%     
-%     imgID = 'imgID';
-%     imgNumber = int2str(length(Dot_valid));
-%     imgIntensity = int2str(median(Dot_intensity));
-%     imgAboveThres = int2str(10);
-%     imgSize = int2str(median(Dot_size));
-%     
-%     singleRecordStr = [entry ',' imgName ',' imgNumber ',' imgIntensity ',' imgSize];
-%     multipleRecord = [multipleRecord, singleRecordStr];
-% end
 
 % after processing all the subfolders, write result to file
 fileID = fopen('data.csv', 'a');
-fprintf(fileID, 'Entry,Folder,Name,Number,Intensity,Size\n');
+fprintf(fileID, 'Entry,Folder,Tested,Name,Number,Intensity,IntensityStd,Size\n');
 for i=1:length(multipleRecord)
     fprintf(fileID,'%s\n',multipleRecord{i});
 end
