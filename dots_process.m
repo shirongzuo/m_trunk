@@ -1,6 +1,9 @@
-function Dot_valid = dots_process(im,showImg)
+function Dot_valid = dots_process(im,showImg,intensityThreshold)
 h=fspecial('gaussian',5,1);
 %im = imfilter(im,h,'same');
+
+threshold = intensityThreshold;
+dot.totalAboveThreshold = 0;
 
 dot.x=0; dot.y=0;dot.size=0;dot.intensity=0;
 Dots=[];
@@ -75,6 +78,10 @@ for i=1:N
         mask = dot_i_box > level;
         theMedian = median(dot_i_box(mask));
         % disp(theMedian);
+        
+        % calculate total above threshold intensity
+        maskI = dot_i_box > threshold;
+        dot.totalAboveThreshold = sum(dot_i_box(maskI));
 
         theSize= 0;
         for m = 1 : size(mask,1)
